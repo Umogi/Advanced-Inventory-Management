@@ -41,6 +41,6 @@ Basically the whole project is going to have
 	- Use JDBC (Java Database Connectivity) to interact with the database.
 ---
 ## Development So Far
-[x] Connection to the sql
-[x] Creates Tables
-[x] Queries for Login and Sees for Admin or User
+ - Connection to the sql
+ - Creates Tables
+ - Queries for Login and Sees for Admin or User
