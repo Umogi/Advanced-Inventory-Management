@@ -146,6 +146,6 @@ VALUES (1, 2, '2025-02-02', 1999.98);
 
 ## License
 
-This project is open-source and available under the MIT License.
+This project is open-source and available under the MIT [LICENSE](LICENSE).
 
 **Developed by [[Umogi](https://github.com/Umogi)]**
