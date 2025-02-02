@@ -148,4 +148,4 @@ VALUES (1, 2, '2025-02-02', 1999.98);
 
 This project is open-source and available under the MIT License.
 
-**Developed by [Umogi]**
+**Developed by [[Umogi](https://github.com/Umogi)]**
