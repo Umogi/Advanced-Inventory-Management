@@ -4,75 +4,45 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
 
 public class DatabaseConnection {
 
-    private static final String DATABASE_URL = "jdbc:sqlite:resources/inventory.db";  // Path to SQLite DB file
-
-    // Method to connect to SQLite
     public static Connection connect() {
+        Connection conn = null;
         try {
-            // Create and return the SQLite connection
-            return DriverManager.getConnection(DATABASE_URL);
-        } catch (Exception e) {
-            System.out.println("Connection failed: " + e.getMessage());
-            return null;
+            String url = "jdbc:sqlite:resources/database.db";  // Database file will be created in the project folder
+            conn = DriverManager.getConnection(url);
+        } catch (SQLException e) {
+            System.out.println("Database connection error: " + e.getMessage());
         }
+        return conn;
     }
 
-    // Method to initialize the database by running the SQL script
     public static void initializeDatabase() {
-        // Way to load and execute the SQL file
-        try (Connection conn = connect();
-             BufferedReader reader = new BufferedReader(new InputStreamReader(DatabaseConnection.class.getClassLoader().getResourceAsStream("database.sql")))) {
-            
-            String line;
-            StringBuilder sqlScript = new StringBuilder();
+        String createUsersTable = Queries.CREATE_USERS_TABLE;
 
-            // Read each line of the database.sql file and build the SQL string
-            while ((line = reader.readLine()) != null) {
-                sqlScript.append(line).append("\n");
-            }
+        String createProductsTable = Queries.CREATE_PRODUCTS_TABLE;
 
-            // Execute the SQL commands
-            Statement stmt = conn.createStatement();
-            stmt.execute(sqlScript.toString());
+        String createSalesTable = Queries.CREATE_SALES_TABLE;
 
-            System.out.println("Database initialized.");
+        String insertSampleUsers = "INSERT INTO Users (username, password, role) "
+                + "SELECT 'admin', 'admin123', 'admin' WHERE NOT EXISTS (SELECT 1 FROM Users WHERE username = 'admin');";
 
-        } catch (IOException e) {
-            System.out.println("Error reading the SQL script: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("Error executing SQL: " + e.getMessage());
-        }
-    }
+        String insertSampleUsers2 = "INSERT INTO Users (username, password, role) "
+                + "SELECT 'user', 'user123', 'user' WHERE NOT EXISTS (SELECT 1 FROM Users WHERE username = 'user');";
 
-    public static boolean checkUserCredentials(String username, String password) {
-        String query = Queries.CHECK_USER_CREDENTIALS;  // Use the query from Queries.java
-        
-        try (Connection conn = connect();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            
-            // Set parameters to prevent SQL injection
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-            
-            // Execute the query and check if a result is returned
-            ResultSet rs = stmt.executeQuery();
+        try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
+            stmt.execute(createUsersTable);
+            stmt.execute(createProductsTable);
+            stmt.execute(createSalesTable);
+            stmt.execute(insertSampleUsers);
+            stmt.execute(insertSampleUsers2);
 
-            // If a matching user is found, the result set will contain the record
-            if (rs.next()) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            System.out.println("Error checking credentials: " + e.getMessage());
-            return false;
+            System.out.println("Database initialized successfully.");
+        } catch (SQLException e) {
+            System.out.println("Error initializing database: " + e.getMessage());
         }
     }
 
